@@ -16,5 +16,6 @@ This repository provides kubernetes yaml deployments and markdown examples for N
         * [Admisson webhook Example](./examples/features/webhook)
         * [Topology aware scale from zero](./examples/features/scale-from-zero)
     * [SRIOV examples](./examples/sriov)
+    * [OVS examples](./examples/ovs)
     * [Memory examples](./examples/memory)
     * [Heal examples](./examples/heal)
