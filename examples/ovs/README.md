@@ -1,4 +1,4 @@
-# Basic examples
+# OVS examples
 
 Contain basic setup for NSM that includes `nsmgr`, `forwarder-ovs`, `registry-k8s`, `admission-webhook-k8s`. This setup can be used to check mechanisms combination or some kind of NSM [features](../features).
 
