@@ -56,6 +56,13 @@ kubectl exec -n spire spire-server-0 -- \
 kubectl apply -k .
 ```
 
+5. Wait for admission-webhook-k8s:
+
+```bash
+WH=$(kubectl get pods -l app=admission-webhook-k8s -n nsm-system --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
+kubectl wait --for=condition=ready --timeout=1m pod ${WH} -n nsm-system
+```
+
 ## Cleanup
 
 To free resouces follow the next command:

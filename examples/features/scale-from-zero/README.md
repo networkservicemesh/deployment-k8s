@@ -42,23 +42,24 @@ SUPPLIER_NODE=${NODES[1]}
 if [ "$SUPPLIER_NODE" == "" ]; then SUPPLIER_NODE=$NSC_NODE; echo "Only 1 node found, testing that pod is created on the same node is useless"; fi
 ```
 
-4. Create patch for NSC:
+4. Create a client patch:
 ```bash
-cat > patch-nsc.yaml <<EOF
+cat > patch-client-app.yaml <<EOF
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nsc-kernel
+  name: client-app
 spec:
   template:
+    metadata:
+      annotations:
+        networkservicemesh.io: kernel://autoscale-icmp-responder/nsm-1
     spec:
       nodeName: $NSC_NODE
       containers:
-        - name: nsc
+        - name: alpine
           env:
-            - name: NSM_NETWORK_SERVICES
-              value: kernel://autoscale-icmp-responder/nsm-1
             - name: NSM_REQUEST_TIMEOUT
               value: 30s
 EOF
@@ -111,10 +112,10 @@ namespace: $NAMESPACE
 
 bases:
 - ../../../apps/nse-supplier-k8s
-- ../../../apps/nsc-kernel
+- ../../../apps/client-app
 
 patchesStrategicMerge:
-- patch-nsc.yaml
+- patch-client-app.yaml
 - patch-supplier.yaml
 
 configMapGenerator:
@@ -139,7 +140,7 @@ kubectl apply -k .
 kubectl wait -n $NAMESPACE --for=condition=ready --timeout=1m pod -l app=nse-supplier-k8s
 ```
 ```bash
-kubectl wait -n $NAMESPACE --for=condition=ready --timeout=1m pod -l app=nsc-kernel
+kubectl wait -n $NAMESPACE --for=condition=ready --timeout=5m pod -l app=client-app
 ```
 ```bash
 kubectl wait -n $NAMESPACE --for=condition=ready --timeout=1m pod -l app=nse-icmp-responder
@@ -147,7 +148,7 @@ kubectl wait -n $NAMESPACE --for=condition=ready --timeout=1m pod -l app=nse-icm
 
 10. Find NSC and NSE pods by labels:
 ```bash
-NSC=$(kubectl get pod -n $NAMESPACE --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' -l app=nsc-kernel)
+NSC=$(kubectl get pod -n $NAMESPACE --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' -l app=client-app)
 NSE=$(kubectl get pod -n $NAMESPACE --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' -l app=nse-icmp-responder)
 ```
 
@@ -169,7 +170,7 @@ if [ $NSC_NODE == $NSE_NODE ]; then echo "OK"; else echo "different nodes"; fals
 
 13. Remove NSC:
 ```bash
-kubectl scale -n $NAMESPACE deployment nsc-kernel --replicas=0
+kubectl scale -n $NAMESPACE deployment client-app --replicas=0
 ```
 
 14. Wait for the NSE pod to be deleted:

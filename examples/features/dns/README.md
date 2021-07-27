@@ -9,12 +9,6 @@ Make sure that you have completed steps from [features](../)
 
 ## Run
 
-Note: Admission webhook is required and should be started at this moment.
-```bash
-WH=$(kubectl get pods -l app=admission-webhook-k8s -n nsm-system --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
-kubectl wait --for=condition=ready --timeout=1m pod ${WH} -n nsm-system
-```
-
 1. Create test namespace:
 ```bash
 NAMESPACE=($(kubectl create -f ../../use-cases/namespace.yaml)[0])
@@ -36,29 +30,24 @@ kubectl exec -n spire spire-server-0 -- \
 NODES=($(kubectl get nodes -o go-template='{{range .items}}{{ if not .spec.taints  }}{{index .metadata.labels "kubernetes.io/hostname"}} {{end}}{{end}}'))
 ```
 
-4. Create alpine deployment and set `nodeSelector` to the first node:
+4. Create client deployment and set `nodeSelector` to the first node:
 ```bash
-cat > alpine.yaml <<EOF
+cat > patch-client-app.yaml <<EOF
 ---
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: alpine
-  annotations:
-    networkservicemesh.io: kernel://my-coredns-service/nsm-1
-  labels:
-    app: alpine
+  name: client-app
 spec:
-  containers:
-  - name: alpine
-    image: alpine
-    stdin: true
-    tty: true
-  nodeSelector:
-    kubernetes.io/hostname: ${NODES[0]}
+  template:
+    metadata:
+      annotations:
+        networkservicemesh.io: kernel://my-coredns-service/nsm-1
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: ${NODES[0]}
 EOF
 ```
-
 
 5. Add to nse-kernel the corends container and set `nodeSelector` it to the second node:
 ```bash
@@ -123,25 +112,26 @@ kind: Kustomization
 namespace: ${NAMESPACE}
 
 bases:
+- ../../../apps/client-app
 - ../../../apps/nse-kernel
 
 resources:
-- alpine.yaml
 - coredns-config-map.yaml
 
 patchesStrategicMerge:
+- patch-client-app.yaml
 - patch-nse.yaml
 EOF
 ```
 
-7. Deploy alpine and nse
+7. Deploy the client-app and nse
 ```bash
 kubectl apply -k .
 ```
 
 8. Wait for applications ready:
 ```bash
-kubectl wait --for=condition=ready --timeout=5m pod alpine -n ${NAMESPACE}
+kubectl wait --for=condition=ready --timeout=5m pod -l app=client-app -n ${NAMESPACE}
 ```
 ```bash
 kubectl wait --for=condition=ready --timeout=5m pod -l app=nse-kernel -n ${NAMESPACE}
@@ -149,13 +139,13 @@ kubectl wait --for=condition=ready --timeout=5m pod -l app=nse-kernel -n ${NAMES
 
 9. Find NSC and NSE pods by labels:
 ```bash
-NSC=$(kubectl get pods -l app=alpine -n ${NAMESPACE} --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
+NSC=$(kubectl get pods -l app=client-app -n ${NAMESPACE} --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
 ```
 ```bash
 NSE=$(kubectl get pods -l app=nse-kernel -n ${NAMESPACE} --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
 ```
 
-10. Ping from alpine to NSE by domain-name:`my.coredns.service`
+10. Ping from client-app to NSE by domain-name:`my.coredns.service`
 ```bash
 kubectl exec ${NSC} -c alpine -n ${NAMESPACE} -- ping -c 4 my.coredns.service
 ```

@@ -122,31 +122,28 @@ kind: Kustomization
 namespace: ${NAMESPACE2}
 
 bases:
-- ../../../../apps/nsc-kernel
+- ../../../../apps/client-app
 
 patchesStrategicMerge:
-- patch-nsc.yaml
+- patch-client-app.yaml
 EOF
 ```
 
-Create NSC patch:
+Create a client patch:
 ```bash
-cat > patch-nsc.yaml <<EOF
+cat > patch-client-app.yaml <<EOF
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nsc-kernel
+  name: client-app
 spec:
   template:
-    spec:
-      containers:
-        - name: nsc
-          env:
-            - name: NSM_NETWORK_SERVICES
-              value: kernel://icmp-responder@my.cluster3/nsm-1
+    metadata:
+      annotations:
+        networkservicemesh.io: kernel://icmp-responder@my.cluster3/nsm-1
 EOF
-``````
+```
 
 Deploy NSC:
 ```bash
@@ -155,13 +152,13 @@ kubectl apply -k .
 
 Wait for applications ready:
 ```bash
-kubectl wait --for=condition=ready --timeout=5m pod -l app=nsc-kernel -n ${NAMESPACE2}
+kubectl wait --for=condition=ready --timeout=5m pod -l app=client-app -n ${NAMESPACE2}
 ```
 
 
 Find NSC pod by labels:
 ```bash
-NSC=$(kubectl get pods -l app=nsc-kernel -n ${NAMESPACE2} --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
+NSC=$(kubectl get pods -l app=client-app -n ${NAMESPACE2} --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
 ```
 
 

@@ -10,3 +10,4 @@ bases:
 - ../../../apps/registry-k8s
 - ../../../apps/registry-proxy-dns
 - ../../../apps/nsmgr-proxy
+- ../../../apps/admission-webhook-k8s

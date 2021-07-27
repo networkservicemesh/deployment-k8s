@@ -45,32 +45,33 @@ resources:
 - passthrough-2.yaml
 - passthrough-3.yaml
 bases:
-- ../../../apps/nsc-kernel
+- ../../../apps/client-app
 - ../../../apps/nse-kernel
 - ./nse-firewall
 
 patchesStrategicMerge:
-- patch-nsc.yaml
+- patch-client-app.yaml
 - patch-nse.yaml
 EOF
 ```
 
-Create NSC patch:
+Create a client patch:
 ```bash
-cat > patch-nsc.yaml <<EOF
+cat > patch-client-app.yaml <<EOF
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nsc-kernel
+  name: client-app
 spec:
   template:
+    metadata:
+      annotations:
+        networkservicemesh.io: kernel://nse-composition/nsm-1
     spec:
       containers:
-        - name: nsc
+        - name: alpine
           env:
-            - name: NSM_NETWORK_SERVICES
-              value: kernel://nse-composition/nsm-1
             - name: NSM_REQUEST_TIMEOUT
               value: 75s
       nodeSelector:
@@ -113,22 +114,22 @@ Deploy Network Service
 kubectl create -f ./nse-composition-ns.yaml
 ```
 
-Deploy NSC and NSE:
+Deploy the client-app and NSE:
 ```bash
 kubectl apply -k .
 ```
 
 Wait for applications ready:
 ```bash
-kubectl wait --for=condition=ready --timeout=1m pod -l app=nsc-kernel -n ${NAMESPACE}
+kubectl wait --for=condition=ready --timeout=5m pod -l app=client-app -n ${NAMESPACE}
 ```
 ```bash
 kubectl wait --for=condition=ready --timeout=1m pod -l app=nse-kernel -n ${NAMESPACE}
 ```
 
-Find nsc and nse pods by labels:
+Find client-app and nse pods by labels:
 ```bash
-NSC=$(kubectl get pods -l app=nsc-kernel -n ${NAMESPACE} --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
+NSC=$(kubectl get pods -l app=client-app -n ${NAMESPACE} --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
 ```
 ```bash
 NSE=$(kubectl get pods -l app=nse-kernel -n ${NAMESPACE} --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')

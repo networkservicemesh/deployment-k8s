@@ -8,3 +8,4 @@ bases:
 - ../../apps/nsmgr
 - ../../apps/forwarder-vpp
 - ../../apps/registry-memory
+- ../../apps/admission-webhook-k8s

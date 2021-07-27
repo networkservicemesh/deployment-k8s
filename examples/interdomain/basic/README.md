@@ -66,6 +66,13 @@ Apply NSM resources for basic tests:
 kubectl apply -k .
 ```
 
+Wait for admission-webhook-k8s:
+
+```bash
+WH=$(kubectl get pods -l app=admission-webhook-k8s -n nsm-system --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
+kubectl wait --for=condition=ready --timeout=1m pod ${WH} -n nsm-system
+```
+
 **1.1. Add externalIP for services**
 
 *Note: If your cluster is already exposed to public this point can be skipped.*

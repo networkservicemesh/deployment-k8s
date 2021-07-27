@@ -1,0 +1,23 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-app
+  labels:
+    app: client-app
+spec:
+  selector:
+    matchLabels:
+      app: client-app
+  template:
+    metadata:
+      annotations:
+        networkservicemesh.io: kernel://icmp-responder/nsm-1
+      labels:
+        app: client-app
+    spec:
+      containers:
+        - name: alpine
+          image: alpine
+          stdin: true
+          tty: true
