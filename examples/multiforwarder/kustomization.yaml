@@ -5,7 +5,14 @@ kind: Kustomization
 namespace: nsm-system
 
 bases:
-- ../../apps/nsmgr
-- ../../apps/forwarder-vpp
-- ../../apps/forwarder-sriov
-- ../../apps/registry-memory
+  - ../../apps/nsmgr
+  - ../../apps/forwarder-vpp
+  - ../../apps/registry-k8s
+
+patchesJson6902:
+  - target:
+      group: apps
+      version: v1
+      kind: DaemonSet
+      name: forwarder-vpp
+    path: patch-forwarder-vpp.yaml

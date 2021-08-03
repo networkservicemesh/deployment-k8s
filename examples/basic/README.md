@@ -50,7 +50,27 @@ kubectl exec -n spire spire-server-0 -- \
 -selector k8s:sa:registry-k8s-sa
 ```
 
-4. Apply NSM resources for basic tests:
+4. Disable SR-IOV for forwarder-vpp
+
+```bash
+cat > patch-forwarder-vpp.yaml <<EOF
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: forwarder-vpp
+spec:
+  template:
+    spec:
+      containers:
+        - name: forwarder-vpp
+          env:
+            - name: NSM_SRIOV_CONFIG_FILE
+              value: /dev/null
+EOF
+```
+
+5. Apply NSM resources for basic tests:
 
 ```bash
 kubectl apply -k .

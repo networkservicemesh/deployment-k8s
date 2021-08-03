@@ -1,0 +1,23 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: policies
+data:
+  deprecate-forwarder-vpp.rego: |
+    package test
+
+    default check_name = false
+
+    check_name {
+        contains(input.path_segments[_].name, "forwarder-vpp")
+    }
+
+  deprecate-forwarder-sriov.rego: |
+    package test
+
+    default check_name = false
+
+    check_name {
+        contains(input.path_segments[_].name, "forwarder-sriov")
+    }

@@ -34,6 +34,9 @@ kind: Kustomization
 
 namespace: ${NAMESPACE}
 
+resources:
+- policies-configmap.yaml
+
 bases:
 - ../../../apps/nsc-kernel
 - ../../../apps/nse-kernel
@@ -42,7 +45,8 @@ bases:
 
 patchesStrategicMerge:
 - patch-nsc.yaml
-- patch-nse.yaml
+- patch-nse-kernel.yaml
+- patch-nse-vfio.yaml
 EOF
 ```
 
@@ -69,7 +73,7 @@ EOF
 
 Create kernel NSE patch:
 ```bash
-cat > patch-nse.yaml <<EOF
+cat > patch-nse-kernel.yaml <<EOF
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -83,8 +87,45 @@ spec:
           env:
             - name: NSM_CIDR_PREFIX
               value: 172.16.1.100/31
+            - name: NSM_OPA_POLICIES
+              value: /root/policies/deprecate-forwarder-sriov.rego:check_name:false
+          volumeMounts:
+            - name: policies
+              mountPath: /root/policies
+              readOnly: true
+      volumes:
+        - name: policies
+          configMap:
+            name: policies
       nodeSelector:
         kubernetes.io/hostname: ${NODE}
+EOF
+```
+
+Create VFIO NSE patch:
+```bash
+cat > patch-nse-vfio.yaml <<EOF
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nse-vfio
+spec:
+  template:
+    spec:
+      containers:
+        - name: sidecar
+          env:
+            - name: NSE_OPA_POLICIES
+              value: /root/policies/deprecate-forwarder-vpp.rego:check_name:false
+          volumeMounts:
+            - name: policies
+              mountPath: /root/policies
+              readOnly: true
+      volumes:
+        - name: policies
+          configMap:
+            name: policies
 EOF
 ```
 
