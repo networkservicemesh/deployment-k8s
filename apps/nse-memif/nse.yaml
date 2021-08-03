@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
         - name: nse
-          image: ghcr.io/networkservicemesh/ci/cmd-nse-icmp-responder-vpp:d80a086
-          imagePullPolicy: IfNotPresent
+          image: rrandom312/cmd-nse-icmp-responder-vpp:testing
+          imagePullPolicy: Always
           env:
             - name: SPIFFE_ENDPOINT_SOCKET
               value: unix:///run/spire/sockets/agent.sock

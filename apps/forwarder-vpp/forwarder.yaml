@@ -16,8 +16,8 @@ spec:
     spec:
       hostNetwork: true
       containers:
-        - image: ghcr.io/networkservicemesh/ci/cmd-forwarder-vpp:69a4bb0
-          imagePullPolicy: IfNotPresent
+        - image: rrandom312/cmd-forwarder-vpp:testing
+          imagePullPolicy: Always
           name: forwarder-vpp
           securityContext:
             privileged: true
@@ -44,6 +44,12 @@ spec:
               readOnly: true
             - name: nsm-socket
               mountPath: /var/lib/networkservicemesh
+            - name: kubelet-socket
+              mountPath: /var/lib/kubelet
+            - name: cgroup
+              mountPath: /host/sys/fs/cgroup
+            - name: vfio
+              mountPath: /host/dev/vfio
           resources:
             requests:
               cpu: 150m
@@ -64,4 +70,16 @@ spec:
         - name: nsm-socket
           hostPath:
             path: /var/lib/networkservicemesh
+            type: DirectoryOrCreate
+        - name: kubelet-socket
+          hostPath:
+            path: /var/lib/kubelet
+            type: Directory
+        - name: cgroup
+          hostPath:
+            path: /sys/fs/cgroup
+            type: Directory
+        - name: vfio
+          hostPath:
+            path: /dev/vfio
             type: DirectoryOrCreate

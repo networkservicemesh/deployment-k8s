@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
         - name: nsc
-          image: ghcr.io/networkservicemesh/ci/cmd-nsc:6473b3a
-          imagePullPolicy: IfNotPresent
+          image: rrandom312/cmd-nsc:testing
+          imagePullPolicy: Always
           env:
             - name: SPIFFE_ENDPOINT_SOCKET
               value: unix:///run/spire/sockets/agent.sock
