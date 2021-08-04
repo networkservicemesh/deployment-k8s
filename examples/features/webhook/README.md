@@ -53,6 +53,7 @@ spec:
   containers:
   - name: postgres-cl
     image: postgres
+    imagePullPolicy: IfNotPresent
     env:
       - name: POSTGRES_HOST_AUTH_METHOD
         value: trust
@@ -75,6 +76,7 @@ spec:
       containers:
         - name: postgres
           image: postgres
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5432
           env:

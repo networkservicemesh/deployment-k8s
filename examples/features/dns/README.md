@@ -52,6 +52,7 @@ spec:
   containers:
   - name: alpine
     image: alpine
+    imagePullPolicy: IfNotPresent
     stdin: true
     tty: true
   nodeSelector:

@@ -32,7 +32,6 @@ spec:
 
         - name: sidecar
           image: ghcr.io/networkservicemesh/ci/cmd-nse-vfio:bf68709
-          imagePullPolicy: Always
           env:
             - name: SPIFFE_ENDPOINT_SOCKET
               value: unix:///run/spire/sockets/agent.sock
