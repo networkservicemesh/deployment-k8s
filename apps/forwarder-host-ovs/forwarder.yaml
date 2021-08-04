@@ -17,7 +17,7 @@ spec:
       hostPID: true
       hostNetwork: true
       containers:
-        - image: networkservicemeshci/cmd-forwarder-host-ovs:latest
+        - image: ghcr.io/networkservicemesh/ci/cmd-forwarder-ovs-use-host-ovs:811ba56
           imagePullPolicy: IfNotPresent
           name: forwarder-ovs
           securityContext:
@@ -56,8 +56,8 @@ spec:
               readOnly: true
           resources:
             limits:
-              memory: 40Mi
-              cpu: 200m
+              memory: 1Gi
+              cpu: 2
       volumes:
         - name: spire-agent-socket
           hostPath:
