@@ -58,7 +58,7 @@ kubectl apply -k .
 
 ## Cleanup
 
-To free resouces follow the next command:
+To free resources follow the next command:
 
 ```bash
 kubectl delete mutatingwebhookconfiguration --all

@@ -18,3 +18,4 @@ This repository provides kubernetes yaml deployments and markdown examples for N
     * [SRIOV examples](./examples/sriov)
     * [Memory examples](./examples/memory)
     * [Heal examples](./examples/heal)
+    * [Scalability tests](./examples/scalability)

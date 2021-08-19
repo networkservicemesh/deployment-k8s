@@ -1,0 +1,86 @@
+---
+# for Kubernetes versions before 1.9.0 use apps/v1beta2
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cadvisor
+  namespace: cadvisor
+  annotations:
+    seccomp.security.alpha.kubernetes.io/pod: 'docker/default'
+spec:
+  selector:
+    matchLabels:
+      name: cadvisor
+  template:
+    metadata:
+      labels:
+        name: cadvisor
+    spec:
+      serviceAccountName: cadvisor
+      containers:
+        - name: cadvisor
+          image: gcr.io/cadvisor/cadvisor:v0.39.0
+          imagePullPolicy: IfNotPresent
+          args:
+            - --port=9089
+            - --housekeeping_interval=1s
+            - --max_housekeeping_interval=2s
+            - --event_storage_event_limit=default=0
+            - --event_storage_age_limit=default=0
+            - --disable_metrics=accelerator,cpu_topology,disk,diskIO,memory_numa,network,tcp,udp,advtcp,sched,process,percpu,hugetlb,referenced_memory,resctrl,cpuset
+            - --docker_only
+            - --store_container_labels=false
+            - --whitelisted_container_labels=io.kubernetes.container.name, io.kubernetes.pod.name,io.kubernetes.pod.namespace
+          ports:
+            - name: http
+              hostPort: 9089
+              containerPort: 9089
+              protocol: TCP
+          volumeMounts:
+            - name: rootfs
+              mountPath: /rootfs
+              readOnly: true
+            - name: var-run
+              mountPath: /var/run
+              readOnly: true
+            - name: sys
+              mountPath: /sys
+              readOnly: true
+            - name: docker
+              mountPath: /var/lib/docker
+              readOnly: true
+            - name: disk
+              mountPath: /dev/disk
+              readOnly: true
+          resources:
+            requests:
+              memory: 100Mi
+              cpu: 200m
+            limits:
+              memory: 400Mi
+              cpu: 1000m
+          readinessProbe:
+            exec:
+              command:
+                - wget
+                - localhost:9089/healthz
+                - -O
+                - /dev/null
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: rootfs
+          hostPath:
+            path: /
+        - name: var-run
+          hostPath:
+            path: /var/run
+        - name: sys
+          hostPath:
+            path: /sys
+        - name: docker
+          hostPath:
+            path: /var/lib/docker
+        - name: disk
+          hostPath:
+            path: /dev/disk

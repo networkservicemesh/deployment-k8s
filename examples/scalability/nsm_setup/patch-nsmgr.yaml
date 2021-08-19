@@ -1,0 +1,17 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nsmgr
+spec:
+  template:
+    spec:
+      containers:
+        - name: nsmgr
+          resources:
+            requests:
+              memory: "0"
+              cpu: "0"
+            limits:
+              memory: "0"
+              cpu: "0"
