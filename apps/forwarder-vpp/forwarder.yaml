@@ -50,12 +50,6 @@ spec:
             limits:
               memory: 400Mi
               cpu: 500m
-          readinessProbe:
-            exec:
-              command: ["/bin/grpc-health-probe", "-spiffe", "-addr=unix:///listen.on.sock"]
-          livenessProbe:
-            exec:
-              command: ["/bin/grpc-health-probe", "-spiffe", "-addr=unix:///listen.on.sock"]
       volumes:
         - name: spire-agent-socket
           hostPath:

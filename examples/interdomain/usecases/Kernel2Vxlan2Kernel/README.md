@@ -29,8 +29,8 @@ Register namespace in `spire` server:
 ```bash
 kubectl exec -n spire spire-server-0 -- \
 /opt/spire/bin/spire-server entry create \
--spiffeID spiffe://example.org/ns/${NAMESPACE1}/sa/default \
--parentID spiffe://example.org/ns/spire/sa/spire-agent \
+-spiffeID spiffe://nsm.cluster2/ns/${NAMESPACE1}/sa/default \
+-parentID spiffe://nsm.cluster2/ns/spire/sa/spire-agent \
 -selector k8s:ns:${NAMESPACE1} \
 -selector k8s:sa:default
 ```
@@ -99,8 +99,8 @@ Register namespace in `spire` server:
 ```bash
 kubectl exec -n spire spire-server-0 -- \
 /opt/spire/bin/spire-server entry create \
--spiffeID spiffe://example.org/ns/${NAMESPACE2}/sa/default \
--parentID spiffe://example.org/ns/spire/sa/spire-agent \
+-spiffeID spiffe://nsm.cluster1/ns/${NAMESPACE2}/sa/default \
+-parentID spiffe://nsm.cluster1/ns/spire/sa/spire-agent \
 -selector k8s:ns:${NAMESPACE2} \
 -selector k8s:sa:default
 ```
