@@ -7,21 +7,15 @@ namespace: spire
 generatorOptions:
   disableNameSuffixHash: true
 
-secretGenerator:
-- name: spire-secret
-  files:
-  - bootstrap.key
-  - bootstrap.crt
-
 resources:
 - spire-namespace.yaml
 - agent-account.yaml
 - agent-cluster-role.yaml
-- agent-configmap.yaml
+# - agent-configmap.yaml
 - agent-daemonset.yaml
+# - server-configmap.yaml
 - server-account.yaml
 - server-cluster-role.yaml
-- server-configmap.yaml
 - server-service.yaml
 - server-statefulset.yaml
 - spire-bundle-configmap.yaml

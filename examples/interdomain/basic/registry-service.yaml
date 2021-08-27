@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: nsm-system
+  name: registry
+spec:
+  externalIPs:
+    - 172.18.0.4
+  selector:
+    app: registry
+  ports:
+    - name: registry
+      protocol: TCP
+      port: 5002
+      targetPort: 5002

@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: nsm-system
+  name: nsmgr-proxy
+spec:
+  externalIPs:
+    - 172.18.0.4
+  selector:
+    app: nsmgr-proxy
+  ports:
+    - protocol: TCP
+      port: 5004
+      targetPort: 5004
+

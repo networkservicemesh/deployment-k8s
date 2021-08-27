@@ -18,6 +18,7 @@ spec:
       labels:
         app: spire-server
     spec:
+      hostNetwork: true
       serviceAccountName: spire-server
       containers:
         - name: spire-server
@@ -31,8 +32,6 @@ spec:
             - name: spire-config
               mountPath: /run/spire/config
               readOnly: true
-            - name: spire-secret
-              mountPath: /run/spire/secret
           livenessProbe:
             exec:
               command:
@@ -46,6 +45,3 @@ spec:
         - name: spire-config
           configMap:
             name: spire-server
-        - name: spire-secret
-          secret:
-            secretName: spire-secret
