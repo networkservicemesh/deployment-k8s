@@ -65,3 +65,8 @@ jobs:
           BRANCH_POINT=$(git merge-base ${{github.event.pull_request.base.sha}} HEAD)
           echo "branch point: $BRANCH_POINT"
           find . -type f -not -path "./.github/*" ! -name '*.yaml' ! -name '*.yml' -exec git diff "${{ github.event.pull_request.head.sha }}".."$BRANCH_POINT" --exit-code -- {} +
+  markdown-link-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: gaurav-nelson/github-action-markdown-link-check@v1
