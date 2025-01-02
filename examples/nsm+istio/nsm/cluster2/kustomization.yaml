@@ -1,0 +1,21 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: nsm-system
+
+bases:
+- https://github.com/networkservicemesh/deployments-k8s/apps/nsmgr?ref=v1.3.1
+- https://github.com/networkservicemesh/deployments-k8s/apps/forwarder-vpp?ref=36c45f669924a7fc2f070a9b5cb78951eedf272f
+- https://github.com/networkservicemesh/deployments-k8s/apps/registry-k8s?ref=v1.3.1
+- https://github.com/networkservicemesh/deployments-k8s/apps/registry-proxy-dns?ref=v1.3.1
+- https://github.com/networkservicemesh/deployments-k8s/apps/nsmgr-proxy?ref=v1.3.1
+- https://github.com/networkservicemesh/deployments-k8s/apps/admission-webhook-k8s?ref=36c45f669924a7fc2f070a9b5cb78951eedf272f
+
+patchesStrategicMerge:
+- patch-nsmgr-proxy.yaml
+- patch-registry-proxy-dns.yaml
+- patch-registry.yaml
+
+resources:
+  - namespace.yaml

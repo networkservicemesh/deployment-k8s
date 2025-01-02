@@ -1,0 +1,32 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nse-supplier-k8s
+spec:
+  template:
+    metadata:
+      labels:
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+        - name: nse-supplier
+          env:
+            - name: NSM_SERVICE_NAME
+              value: autoscale-istio-proxy
+            - name: NSM_LABELS
+              value: any:true
+            - name: NSM_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: NSM_POD_DESCRIPTION_FILE
+              value: /run/supplier/pod-template.yaml
+          volumeMounts:
+            - name: pod-file
+              mountPath: /run/supplier
+              readOnly: true
+      volumes:
+        - name: pod-file
+          configMap:
+            name: supplier-pod-template-configmap

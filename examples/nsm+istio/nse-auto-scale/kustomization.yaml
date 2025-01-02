@@ -1,0 +1,17 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+bases:
+- https://github.com/networkservicemesh/deployments-k8s/apps/nse-supplier-k8s?ref=36c45f669924a7fc2f070a9b5cb78951eedf272f
+
+patchesStrategicMerge:
+- patch-supplier.yaml
+
+configMapGenerator:
+  - name: supplier-pod-template-configmap
+    files:
+      - pod-template.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true

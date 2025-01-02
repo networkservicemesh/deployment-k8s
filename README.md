@@ -26,6 +26,7 @@
         * [And other usecases](./examples/interdomain/usecases/)
     * [Open telemetry examples](./examples/observability/)
     * [Features examples](./examples/features)
+        * [NSM+Istio example](./examples/nsm+istio)
         * [OPA example](./examples/features/opa)
         * [IPv6 examples](./examples/features/ipv6)
         * [Dual stack example](./examples/features/dual-stack)

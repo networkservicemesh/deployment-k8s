@@ -1,0 +1,10 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nsmgr-proxy
+spec:
+  template:
+    metadata:
+      annotations:
+        spiffe.io/federatesWith: nsm.cluster2

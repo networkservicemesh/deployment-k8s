@@ -1,0 +1,10 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: registry-k8s
+spec:
+  template:
+    metadata:
+      annotations:
+        spiffe.io/federatesWith: nsm.cluster1
