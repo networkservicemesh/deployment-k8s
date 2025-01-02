@@ -1,0 +1,24 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: forwarder-ovs
+spec:
+  template:
+    spec:
+      containers:
+        - name: forwarder-ovs
+          env:
+            - name: NSM_L2_RESOURCE_SELECTOR_FILE
+              value: /var/lib/networkservicemesh/device-selector.yaml
+          volumeMounts:
+            - name: devsel-vol
+              mountPath: /var/lib/networkservicemesh/device-selector.yaml
+              subPath: device-selector.yaml
+      volumes:
+      - name: devsel-vol
+        configMap:
+          name: device-selector
+          items:
+          - key: selector
+            path: device-selector.yaml
