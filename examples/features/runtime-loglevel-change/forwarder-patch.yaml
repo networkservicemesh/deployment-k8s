@@ -1,0 +1,14 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: forwarder-vpp
+spec:
+  selector: {}
+  template:
+    spec:
+      containers:
+      - name: forwarder-vpp
+        env:
+        - name: NSM_LOG_LEVEL
+          value: "INFO"

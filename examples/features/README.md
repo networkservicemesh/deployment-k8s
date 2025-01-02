@@ -36,4 +36,5 @@ To run any feature example follow steps for [Basic NSM setup](../basic)
 - [Scaled Registry K8s](./scaled-registry)
 - [NSC changes endpoints dynamically](./change-nse-dynamically)
 - [NSE IPAM Policies](./ipam-policies)
+- [Runtime LogLevel Change](./runtime-loglevel-change)
 
