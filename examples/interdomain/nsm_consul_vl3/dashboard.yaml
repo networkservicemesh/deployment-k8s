@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dashboard
+  namespace: default
+  labels:
+    name: dashboard
+  annotations:
+    networkservicemesh.io: kernel://my-vl3-network@my.cluster1/nsm-1
+spec:
+  containers:
+  - image: ubuntu:18.04
+    ports:
+    - containerPort: 5681
+    command:
+    - /bin/sh
+    - "-c"
+    - "sleep 600m"
+    imagePullPolicy: IfNotPresent
+    name: ubuntu
+    securityContext:
+            privileged: true
+  - name: dashboard
+    image: hashicorp/dashboard-service:0.0.4
+    ports:
+    - containerPort: 9002
+    env:
+    - name: COUNTING_SERVICE_URL
+      value: 'http://localhost:5000'
+  restartPolicy: OnFailure

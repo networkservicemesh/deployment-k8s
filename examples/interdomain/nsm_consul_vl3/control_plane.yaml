@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consul-cp
+  labels:
+    name: control-plane
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: control-plane
+  template:
+    metadata:
+      labels:
+        name: control-plane
+      annotations:
+        networkservicemesh.io: kernel://my-vl3-network/nsm-1
+    spec:
+      containers:
+      - image: ubuntu:18.04
+        ports:
+        - containerPort: 5681
+        command:
+        - /bin/sh
+        - "-c"
+        - "sleep 600m"
+        imagePullPolicy: IfNotPresent
+        name: ubuntu
+        securityContext:
+            privileged: true

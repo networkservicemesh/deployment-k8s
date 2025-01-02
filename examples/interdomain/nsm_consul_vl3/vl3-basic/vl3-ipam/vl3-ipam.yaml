@@ -1,0 +1,51 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vl3-ipam
+  labels:
+    app: vl3-ipam
+spec:
+  selector:
+    matchLabels:
+      app: vl3-ipam
+  template:
+    metadata:
+      labels:
+        app: vl3-ipam
+        "spiffe.io/spiffe-id": "true"
+    spec:
+      containers:
+        - image: ghcr.io/networkservicemesh/ci/cmd-ipam-vl3:a918ec8
+          env:
+            - name: SPIFFE_ENDPOINT_SOCKET
+              value: unix:///run/spire/sockets/agent.sock
+            - name: NSM_LISTEN_ON
+              value: tcp://:5006
+            - name: NSM_PREFIX
+              value: 169.254.0.0/16
+            - name: NSM_LOG_LEVEL
+              value: TRACE
+          imagePullPolicy: IfNotPresent
+          name: vl3-ipam
+          ports:
+            - containerPort: 5006
+              hostPort: 5006
+          volumeMounts:
+            - name: spire-agent-socket
+              mountPath: /run/spire/sockets
+          resources:
+            requests:
+              cpu: 100m
+            limits:
+              memory: 40Mi
+              cpu: 200m
+      volumes:
+        - name: spire-agent-socket
+          hostPath:
+            path: /run/spire/sockets
+            type: Directory
+        - name: nsm-socket
+          hostPath:
+            path: /var/lib/networkservicemesh
+            type: DirectoryOrCreate

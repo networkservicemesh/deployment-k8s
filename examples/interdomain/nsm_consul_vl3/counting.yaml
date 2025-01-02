@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: counting
+  namespace: default
+  labels:
+    name: counting
+  annotations:
+    networkservicemesh.io: kernel://my-vl3-network/nsm-1
+spec:
+  containers:
+  - image: ubuntu:18.04
+    ports:
+    - containerPort: 5681
+    command:
+    - /bin/sh
+    - "-c"
+    - "sleep 600m"
+    imagePullPolicy: IfNotPresent
+    name: ubuntu
+    securityContext:
+            privileged: true
+  - name: counting
+    image: hashicorp/counting-service:0.0.2
+    securityContext:
+      privileged: true
+    ports:
+    - containerPort: 9001
+  restartPolicy: OnFailure

@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nse-vl3-vpp
+  labels:
+    app: nse-vl3-vpp
+spec:
+  selector:
+    matchLabels:
+      app: nse-vl3-vpp
+  template:
+    metadata:
+      labels:
+        app: nse-vl3-vpp
+        "spiffe.io/spiffe-id": "true"
+    spec:
+      containers:
+        - name: nse
+          image: ghcr.io/networkservicemesh/ci/cmd-nse-vl3-vpp:898133e
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SPIFFE_ENDPOINT_SOCKET
+              value: unix:///run/spire/sockets/agent.sock
+            - name: NSM_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NSM_LOG_LEVEL
+              value: TRACE
+          volumeMounts:
+            - name: spire-agent-socket
+              mountPath: /run/spire/sockets
+              readOnly: true
+            - name: nsm-socket
+              mountPath: /var/lib/networkservicemesh
+              readOnly: true
+          resources:
+            requests:
+              cpu: 150m
+            limits:
+              memory: 400Mi
+              cpu: 500m
+      volumes:
+        - name: spire-agent-socket
+          hostPath:
+            path: /run/spire/sockets
+            type: Directory
+        - name: nsm-socket
+          hostPath:
+            path: /var/lib/networkservicemesh
+            type: DirectoryOrCreate
