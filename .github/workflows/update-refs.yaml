@@ -8,12 +8,20 @@ jobs:
   update-refs:
     name: Update references
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.actor == 'nsmbot' || github.event_name == 'push' }}
     steps:
       - name: Check out the code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           ref: main
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
       - name: Update references
         run: |
           sed -r -i '/github.com\/networkservicemesh\/deployments-k8s/ s/(\?ref=[a-z0-9.]*)/\?ref='"$GITHUB_SHA"'/g' `grep '?ref=' -rl *`
@@ -21,5 +29,5 @@ jobs:
           git config --global user.email "nsmbot@networkservicmesh.io"
           git config --global user.name "nsmbot"
           git add -- .
-          git commit -s -m "Update references"
+          git commit -m "Update references"
           git push
