@@ -1,0 +1,11 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: ns-nsc-nse-scaling
+
+resources:
+- ns-nsc-nse-scaling.yaml
+- netsvc.yaml
+- nsc.yaml
+- nse.yaml

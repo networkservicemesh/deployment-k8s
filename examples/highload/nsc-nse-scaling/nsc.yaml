@@ -1,0 +1,56 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nsc-kernel
+  labels:
+    app: nsc-kernel
+spec:
+  selector:
+    matchLabels:
+      app: nsc-kernel
+  replicas: 0
+  template:
+    metadata:
+      labels:
+        app: nsc-kernel
+        "spiffe.io/spiffe-id": "true"
+    spec:
+      containers:
+        - name: nsc
+          image: ghcr.io/networkservicemesh/cmd-nsc:v1.13.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SPIFFE_ENDPOINT_SOCKET
+              value: unix:///run/spire/sockets/agent.sock
+            - name: NSM_LOG_LEVEL
+              value: INFO
+            - name: NSM_NETWORK_SERVICES
+              value: kernel://nsc-nse-scaling/nsm-1
+            - name: NSM_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          volumeMounts:
+            - name: spire-agent-socket
+              mountPath: /run/spire/sockets
+              readOnly: true
+            - name: nsm-socket
+              mountPath: /var/lib/networkservicemesh
+              readOnly: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 40Mi
+            limits:
+              memory: 80Mi
+              cpu: 200m
+      volumes:
+        - name: spire-agent-socket
+          hostPath:
+            path: /run/spire/sockets
+            type: Directory
+        - name: nsm-socket
+          hostPath:
+            path: /var/lib/networkservicemesh
+            type: DirectoryOrCreate
