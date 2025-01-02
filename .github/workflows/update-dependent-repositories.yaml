@@ -77,7 +77,7 @@ jobs:
           echo "PR link: https://github.com/${{ github.repository }}/pull/${{ steps.findPr.outputs.pr }}" >> /tmp/commit-message
           echo "" >> /tmp/commit-message
           LOG_MSG=$(git log --date=iso --pretty='format:Commit: %h%nAuthor: %an%nDate: %ad%nMessage:%n  - %B%n' -1 | sed '/^$/d;$d')
-          for((i=2;i<=18;i+=2)); do n=$(printf '%*s' $((i+2))) m=$(printf '%*s' $i) LOG_MSG=$(echo "$LOG_MSG" | tr '\n' '|' | sed "s/${m}-/${n}-/2g" | tr '|' '\n'); done
+          LOG_MSG=$(echo "$LOG_MSG" | tr '\n' '|' | sed "s/  -/    -/2g" | tr '|' '\n')
           echo "$LOG_MSG" >> /tmp/commit-message
           echo "Commit Message:"
           cat /tmp/commit-message
