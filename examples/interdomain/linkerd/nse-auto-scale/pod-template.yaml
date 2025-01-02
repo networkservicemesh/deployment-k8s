@@ -1,0 +1,74 @@
+---
+apiVersion: apps/v1
+kind: Pod
+metadata:
+  name: proxy-{{ index .Labels "podName" }}
+  labels:
+    "spiffe.io/spiffe-id": "true"
+  annotations:
+    linkerd.io/inject: enabled
+    config.linkerd.io/enable-debug-sidecar: "false"
+spec:
+  restartPolicy: Never
+  containers:
+    - name: nse
+      image: nikitaxored/cmd-nse-l7-proxy:clean
+      imagePullPolicy: IfNotPresent
+      securityContext:
+        privileged: true
+      env:
+        - name: SPIFFE_ENDPOINT_SOCKET
+          value: unix:///run/spire/sockets/agent.sock
+        - name: NSM_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAME
+          value: {{ index .Labels "podName" }}
+        - name: NSM_CONNECT_TO
+          value: unix:///var/lib/networkservicemesh/nsm.io.sock
+        - name: NSM_CIDR_PREFIX
+          value: 172.16.1.2/31
+        - name: NSM_SERVICE_NAMES
+          value: nsm-linkerd
+        - name: NSM_LABELS
+          value: app:{{ index .Labels "app" }}
+        - name: NSM_IDLE_TIMEOUT
+          value: 240s
+        - name: NSM_LOG_LEVEL
+          value: TRACE
+        - name: NSM_REWRITEIP
+          value: "false"
+        - name: NSM_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: NSM_RULES_CONFIG_PATH
+          value: iptables-map/iptables-map.yaml
+        - name: NSM_REGISTRY_CLIENT_POLICIES
+          value: ""
+      volumeMounts:
+        - name: spire-agent-socket
+          mountPath: /run/spire/sockets
+          readOnly: true
+        - name: nsm-socket
+          mountPath: /var/lib/networkservicemesh
+          readOnly: true
+        - name: iptables-config-map
+          mountPath: /iptables-map
+      resources:
+        limits:
+          memory: 40Mi
+          cpu: 150m
+  volumes:
+    - name: spire-agent-socket
+      hostPath:
+        path: /run/spire/sockets
+        type: Directory
+    - name: nsm-socket
+      hostPath:
+        path: /var/lib/networkservicemesh
+        type: DirectoryOrCreate
+    - name: iptables-config-map
+      configMap:
+        name: iptables-map

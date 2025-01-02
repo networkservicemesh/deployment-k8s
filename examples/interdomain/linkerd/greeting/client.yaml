@@ -1,0 +1,35 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alpine
+  labels:
+    app: alpine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alpine
+  template:
+    metadata:
+      labels:
+        app: alpine
+      annotations:
+        networkservicemesh.io: kernel://nsm-linkerd@my.cluster2/nsm-1?app=greeting
+    spec:
+      containers:
+        - name: alpine
+          image: alpine:3.15.0
+          imagePullPolicy: IfNotPresent
+          stdin: true
+          tty: true
+          securityContext:
+            privileged: true
+        - name: server
+          image: hashicorp/http-echo:alpine
+          args:
+            - -text="hello world from greeting.cluster1"
+            - -listen=:9081
+          ports:
+            - containerPort: 9081
+              name: http
